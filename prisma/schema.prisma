@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model READINGS_ELECTRICITY {
+  ID      Int      @id @default(autoincrement())
+  VALUE   Decimal? @db.Decimal
+  DATE    DateTime @default(dbgenerated("LOCALTIMESTAMP")) @db.Timestamp(6)
+  COMMENT String?  @db.VarChar(255)
+}
+
+/// This table has subclasses and requires additional setup for migrations. Visit https://pris.ly/d/table-inheritance for more info.
+model READINGS_GAS {
+  ID      Int      @id @default(autoincrement())
+  VALUE   Decimal? @db.Decimal
+  DATE    DateTime @default(dbgenerated("LOCALTIMESTAMP")) @db.Timestamp(6)
+  COMMENT String?  @db.VarChar(255)
+}
