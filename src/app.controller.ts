@@ -16,17 +16,17 @@ export class AppController {
 
   @Post('submit')
   async submitReadings(
-    @Body() data: 
-	{
-		 gas: string,
-		 electricity: string
-	},
+    @Body()
+    data: {
+      gas: string;
+      electricity: string;
+    },
     //@Req() request: Request,
     //@Res() response: Response,
   ) {
-    this.appService.submitReadings(parseFloat(data.gas), parseInt(data.electricity));
+    this.appService.submitReadings(
+      parseFloat(data.gas),
+      parseInt(data.electricity),
+    );
   }
-
-
-
 }

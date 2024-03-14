@@ -7,6 +7,6 @@ import { PrismaService } from 'prisma/prisma.service';
 @Module({
   controllers: [GasController],
   providers: [GasService],
-  imports: [PrismaModule]
+  imports: [PrismaModule],
 })
 export class GasModule {}

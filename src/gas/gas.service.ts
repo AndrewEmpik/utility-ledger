@@ -5,14 +5,12 @@ import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class GasService {
-	constructor(
-		private prisma: PrismaService
-	)	{}
+  constructor(private prisma: PrismaService) {}
 
   async create(createGasDto: CreateGasDto) {
     return await this.prisma.rEADINGS_GAS.create({
-		data: createGasDto,
-	});
+      data: createGasDto,
+    });
   }
 
   findAll() {
