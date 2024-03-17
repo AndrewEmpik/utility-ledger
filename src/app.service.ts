@@ -15,8 +15,17 @@ export class AppService {
     return 'Hello World!';
   }
 
-  getIndexPage(request, res) {
-    res.send(pug.renderFile('./views/index.pug', {}));
+  async getIndexPage(request, res) {
+    const previousGas = this.gasService.getLastReadings();
+    const previousElectricity = this.electricityService.getLastReadings();
+
+    const vars = {
+      previousGas: (await previousGas)[0].reading,
+      previousElectricity: (await previousElectricity)[0].reading,
+      previousGasUse: (await previousGas)[0].use,
+      previousElectricityUse: (await previousElectricity)[0].use,
+    };
+    res.send(pug.renderFile('./views/index.pug', vars));
   }
 
   async submitReadings(gas: number, electricity: number) {
