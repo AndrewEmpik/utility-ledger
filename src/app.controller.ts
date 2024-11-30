@@ -10,6 +10,11 @@ export class AppController {
     this.appService.getIndexPage(request, res);
   }
 
+  @Get('history')
+  async historyPage(@Req() request: Request, @Res() res: Response) {
+    this.appService.getHistoryPage(request, res);
+  }
+
   getHello(): string {
     return this.appService.getHello();
   }

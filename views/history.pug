@@ -1,0 +1,62 @@
+doctype html
+html(lang="en")
+	head
+		meta(charset="UTF-8")
+		meta(http-equiv="X-UA-Compatible", content="IE=edge")
+		meta(name="viewport", content="width=device-width, initial-scale=1.0")
+		title Комуналка - історія
+		style.
+			body {
+				font-family: Verdana;
+				background: #1f1f1f;
+				color: #b5bac9;
+				font-size: 16px;
+				padding: 10px;
+			}
+			.previous-readings-label {
+				font-size: 16px;
+				color: lightgray;
+			}
+			.previous-readings-value {
+				font-weight: bold;
+				font-size: 16px;
+				color: lightgray;
+			}
+			input {
+				width: 100px;
+				font-size: 18px;
+			}
+			.button-large {
+				width: 150px;
+				height: 50px;
+				font-size: 28px;
+				font-weight: bold;
+				background-color: #4CAF50;
+				color: white;
+				border: none;
+				border-radius: 8px;
+			}
+			td {
+				border: 1px solid grey;
+				padding: 5px;
+			}
+	body
+		h3 Історія показників і споживання за останні 30 днів:
+
+		table(style="border-collapse: collapse; border: 1px solid lightblue; width: 100%;")
+			thead
+				tr
+					th Дата
+					th Газ
+					th Вик.
+					th Електрика
+					th Вик.
+
+			tbody
+				each record in readings
+					tr
+						td.previous-readings-label= record.date
+						td.previous-readings-label= record.gasReading
+						td.previous-readings-label= record.gasUse	
+						td.previous-readings-label= record.electricityReading
+						td.previous-readings-label= record.electricityUse	

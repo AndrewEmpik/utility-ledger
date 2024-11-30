@@ -31,7 +31,7 @@ export class ElectricityService {
     const results = [];
     for (let i = 0; i < n; i++) {
       const res = {
-        date: set[i].DATE,
+        date: set[i].DATE.toLocaleDateString('uk-UA'),
         reading: set[i].VALUE,
         use: Math.round((+set[i].VALUE - +set[i + 1].VALUE) * 1000) / 1000,
       };

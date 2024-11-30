@@ -28,6 +28,28 @@ export class AppService {
     res.send(pug.renderFile('./views/index.pug', vars));
   }
 
+  async getHistoryPage(request, res) {
+    const previousGas = await this.gasService.getLastReadings(30);
+    const previousElectricity =
+      await this.electricityService.getLastReadings(30);
+
+    let allReadings = [];
+    for (let i = 0; i < 30; i++) {
+      allReadings.push({
+        date: previousGas[i].date,
+        gasReading: previousGas[i].reading,
+        gasUse: previousGas[i].use,
+        electricityReading: previousElectricity[i].reading,
+        electricityUse: previousElectricity[i].use,
+      });
+    }
+
+    const vars = {
+      readings: allReadings,
+    };
+    res.send(pug.renderFile('./views/history.pug', vars));
+  }
+
   async submitReadings(gas: number, electricity: number) {
     console.log('Газ: ' + gas + ', електрика: ' + electricity);
 
