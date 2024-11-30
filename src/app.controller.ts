@@ -15,10 +15,6 @@ export class AppController {
     this.appService.getHistoryPage(request, res);
   }
 
-  getHello(): string {
-    return this.appService.getHello();
-  }
-
   @Post('submit')
   async submitReadings(
     @Body()

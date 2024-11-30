@@ -36,6 +36,40 @@ html(lang="en")
 				border: none;
 				border-radius: 8px;
 			}
+			.button-history {
+				width: 150px;
+				height: 72px;
+				font-size: 22px;
+				font-weight: bold;
+				background-color: #4C50AF;
+				color: white;
+				border: none;
+				border-radius: 8px;
+			}
+			.table-section {
+				margin-top: 20px;
+				overflow-x: auto;
+			}
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				margin-bottom: 20px;
+			}
+			th, td {
+				border: 1px solid #333;
+				padding: 10px;
+				text-align: left;
+				font-size: 16px;
+			}
+			th {
+				background-color: #2a2a2a;
+				color: #b5bac9;
+			}
+			td {
+				background-color: #1f1f1f;
+				color: #b5bac9;
+			}
+			
 	body
 		h2 Введення показників газу й електрики:
 		form(method="post" action="/submit")
@@ -54,3 +88,81 @@ html(lang="en")
 				span.previous-readings-value #{previousElectricityUse}
 			p
 			button(type="submit" class="button-large") Запис!
+
+		h2 Зведення:
+		.table-section
+		h3 Газ:
+		.previous-readings-label Тариф: 
+			span.previous-readings-value #{gasRate} грн/м³
+		h4 Поточний місяць:
+		table
+			tr
+			th 
+			th Споживання
+			th Сума
+			tr
+			td На поточний день
+			td #{gasCurrUsage}
+			td #{gasCurrCost}
+			tr
+			td Прогноз
+			td #{gasForecastUsage}
+			td #{gasForecastCost}
+			tr
+			td Середнє, день
+			td #{gasCurrAvgUsagePerDay}
+			td #{gasCurrAvgCostPerDay}
+		h4 Попередній місяць:
+		table
+			tr
+			th
+			th Споживання
+			th Сума
+			tr
+			td Місяць
+			td #{gasPrevMonthUsage}
+			td #{gasPrevMonthCost}
+			tr
+			td Середнє, день
+			td #{gasPrevAvgUsagePerDay}
+			td #{gasPrevAvgCostPerDay}
+
+		h3 Електрика:
+		.previous-readings-label Тариф: 
+			span.previous-readings-value #{electricityRate} грн/кВт⋅год
+		h4 Поточний місяць:
+		table
+			tr
+			th 
+			th Споживання
+			th Сума
+			tr
+			td На поточний день
+			td #{electricityCurrUsage}
+			td #{electricityCurrCost}
+			tr
+			td Прогноз
+			td #{electricityForecastUsage}
+			td #{electricityForecastCost}
+			tr
+			td Середнє, день
+			td #{electricityCurrAvgUsagePerDay}
+			td #{electricityCurrAvgCostPerDay}
+		h4 Попередній місяць:
+		table
+			tr
+			th
+			th Споживання
+			th Сума
+			tr
+			td Місяць
+			td #{electricityPrevMonthUsage}
+			td #{electricityPrevMonthCost}
+			tr
+			td Середнє, день
+			td #{electricityPrevAvgUsagePerDay}
+			td #{electricityPrevAvgCostPerDay}
+
+		p
+		a(href="/history")
+			button(type="button"  class="button-history") Детальна історія
