@@ -42,12 +42,9 @@ export class ElectricityService {
     return results;
   }
 
-  async getFirstDayMonthReading(): Promise<Decimal> {
-    const firstDay = new Date(new Date().setDate(1));
-    const firstDayRange = {
-      start: new Date(firstDay.setHours(0, 0, 0, 0)),
-      end: new Date(firstDay.setHours(23, 59, 59, 999)),
-    };
+  async getFirstDayMonthReading(baseDate = new Date()): Promise<Decimal> {
+    const firstDay = new Date(baseDate.setDate(1));
+    const firstDayRange = this.dateToFullDayRange(firstDay);
 
     const reading = await this.prisma.rEADINGS_ELECTRICITY.findFirst({
       where: { DATE: { gte: firstDayRange.start, lte: firstDayRange.end } },
@@ -57,19 +54,23 @@ export class ElectricityService {
     return reading.VALUE;
   }
 
-  async getLastMonthReadings() {
-    // we need to check the last record date
-    const lastReadingDate = await this.prisma.rEADINGS_ELECTRICITY.findFirst({
-      select: { DATE: true },
-      orderBy: { DATE: 'desc' },
-    });
+  async getLastMonthReadings(baseDate?: Date) {
+    if (!baseDate) {
+      // we need to fetch the last record date
+      baseDate = (
+        await this.prisma.rEADINGS_ELECTRICITY.findFirst({
+          select: { DATE: true },
+          orderBy: { DATE: 'desc' },
+        })
+      ).DATE;
 
-    if (!lastReadingDate) {
-      throw new Error('No readings found');
+      if (!baseDate) {
+        throw new Error('No readings found');
+      }
     }
 
-    const currentMonth = lastReadingDate.DATE.getMonth() + 1;
-    const currentYear = lastReadingDate.DATE.getFullYear();
+    const currentMonth = baseDate.getMonth() + 1;
+    const currentYear = baseDate.getFullYear();
 
     const previousMonth = currentMonth - 1 || 12;
     const previousMonthYear =

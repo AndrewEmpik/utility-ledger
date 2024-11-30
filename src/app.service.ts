@@ -4,6 +4,7 @@ import * as pug from 'pug';
 import { GasService } from './gas/gas.service';
 import { ElectricityService } from './electricity/electricity.service';
 import { Decimal } from '@prisma/client/runtime/library';
+import { PrismaService } from 'prisma/prisma.service';
 
 type ReadingEntry = { date: string; reading: Decimal; use: Decimal };
 export type ReadingsArray = ReadingEntry[];
@@ -13,6 +14,7 @@ export class AppService {
   constructor(
     private readonly gasService: GasService,
     private readonly electricityService: ElectricityService,
+    private prisma: PrismaService,
   ) {}
 
   gasRate = 7.95689;
@@ -43,6 +45,9 @@ export class AppService {
       electricityPrevMonthCost,
       electricityPrevAvgUsagePerDay,
       electricityPrevAvgCostPerDay,
+
+      currentMonthName,
+      previousMonthName,
     } = await this.getSummary();
 
     const vars = {
@@ -74,6 +79,9 @@ export class AppService {
       electricityPrevMonthCost,
       electricityPrevAvgUsagePerDay,
       electricityPrevAvgCostPerDay,
+
+      currentMonthName,
+      previousMonthName,
     };
     res.send(pug.renderFile('./views/index.pug', vars));
   }
@@ -113,18 +121,30 @@ export class AppService {
     console.log(res2);
   }
 
-  async getSummary() {
-    // GAS
+  async getLastReadingDate() {
+    return (
+      await this.prisma.rEADINGS_GAS.findFirst({
+        select: { DATE: true },
+        orderBy: { DATE: 'desc' },
+      })
+    ).DATE;
+  }
 
-    const gasFirstDay = Number(await this.gasService.getFirstDayMonthReading());
+  async getSummary() {
+    const baseDate = await this.getLastReadingDate();
+    const daysPassed = baseDate.getDate() - 1;
+    const daysInMonth = this.getDaysInMonth(baseDate);
+    const forecastCoefficient = daysInMonth / daysPassed;
+
+    const currentMonthName = this.getMonthName(baseDate.getMonth() + 1);
+    const previousMonthName = this.getMonthName(baseDate.getMonth());
+
+    // GAS
+    const gasFirstDay = Number(
+      await this.gasService.getFirstDayMonthReading(new Date(baseDate)),
+    );
     const gasCurrReading = (await this.gasService.getLastReadings(1))[0];
     const gasCurrReadingValue = Number(gasCurrReading.reading);
-    const daysPassed = Number(gasCurrReading.date.split('.')[0]) - 1;
-
-    // temporary solution, TODO reconsider it later
-    const isTodaysReading = new Date().getDate() === daysPassed + 1;
-    const daysInMonth = this.getDaysInMonth(!isTodaysReading);
-    const forecastCoefficient = daysInMonth / daysPassed;
 
     const gasCurrUsage = gasCurrReadingValue - gasFirstDay;
     let gasCurrCost = this.round2(gasCurrUsage * this.gasRate);
@@ -135,8 +155,10 @@ export class AppService {
     let gasCurrAvgCostPerDay =
       daysPassed > 0 ? this.round2(gasCurrCost / daysPassed) : 0;
 
-    // previos month
-    const gasLastMonthReadings = await this.gasService.getLastMonthReadings();
+    // previous month
+    const gasLastMonthReadings = await this.gasService.getLastMonthReadings(
+      new Date(baseDate),
+    );
 
     let gasPrevMonthUsage = this.round2(
       gasLastMonthReadings.currentMonthReading -
@@ -153,7 +175,7 @@ export class AppService {
     // ELECTRICITY
 
     const electricityFirstDay = Number(
-      await this.electricityService.getFirstDayMonthReading(),
+      await this.electricityService.getFirstDayMonthReading(new Date(baseDate)),
     );
     const electricityCurrReading = Number(
       (await this.electricityService.getLastReadings(1))[0].reading,
@@ -174,7 +196,7 @@ export class AppService {
 
     // previos month
     const electricityLastMonthReadings =
-      await this.electricityService.getLastMonthReadings();
+      await this.electricityService.getLastMonthReadings(new Date(baseDate));
 
     let electricityPrevMonthUsage = this.round2(
       electricityLastMonthReadings.currentMonthReading -
@@ -213,6 +235,8 @@ export class AppService {
       electricityPrevMonthCost,
       electricityPrevAvgUsagePerDay,
       electricityPrevAvgCostPerDay,
+      currentMonthName,
+      previousMonthName,
     };
   }
 
@@ -220,17 +244,33 @@ export class AppService {
     return Math.round(n * 100) / 100;
   }
 
-  getDaysInMonth(yesterday: boolean = false): number {
-    const now = new Date();
-
-    // temporary condition, TODO reconsider it later
-    if (yesterday) {
-      now.setDate(now.getDate() - 1);
-    }
-
-    const year = now.getFullYear();
-    const month = now.getMonth() + 1;
+  getDaysInMonth(baseDate: Date = new Date()): number {
+    const year = baseDate.getFullYear();
+    const month = baseDate.getMonth() + 1;
 
     return new Date(year, month, 0).getDate();
+  }
+
+  getMonthName(monthNumber: number): string {
+    const months = [
+      'СІЧЕНЬ',
+      'ЛЮТИЙ',
+      'БЕРЕЗЕНЬ',
+      'КВІТЕНЬ',
+      'ТРАВЕНЬ',
+      'ЧЕРВЕНЬ',
+      'ЛИПЕНЬ',
+      'СЕРПЕНЬ',
+      'ВЕРЕСЕНЬ',
+      'ЖОВТЕНЬ',
+      'ЛИСТОПАД',
+      'ГРУДЕНЬ',
+    ];
+
+    if (monthNumber < 1 || monthNumber > 12) {
+      throw new Error('Month number should be between 1 and 12.');
+    }
+
+    return months[monthNumber - 1];
   }
 }
