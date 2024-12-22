@@ -69,6 +69,16 @@ html(lang="en")
 				background-color: #1f1f1f;
 				color: #b5bac9;
 			}
+			table.previous-month {
+				background-color: #1a1a1a;
+			}
+			table.previous-month th {
+				background-color: #242424;
+				color: #6c6c6c;
+			}
+			table.previous-month td {
+				color: #6c6c6c;
+			}
 			
 	body
 		h2 Введення показників газу й електрики:
@@ -112,20 +122,22 @@ html(lang="en")
 			td Середнє, день
 			td #{gasCurrAvgUsagePerDay}
 			td #{gasCurrAvgCostPerDay}
-		h4 Попередній місяць:
-		table
-			tr
-			th #{previousMonthName}
-			th Споживання
-			th Сума
-			tr
-			td Місяць
-			td #{gasPrevMonthUsage}
-			td #{gasPrevMonthCost}
-			tr
-			td Середнє, день
-			td #{gasPrevAvgUsagePerDay}
-			td #{gasPrevAvgCostPerDay}
+		details
+			summary Натисніть для перегляду попереднього місяця
+			h4 Попередній місяць:
+			table.previous-month
+				tr
+				th #{previousMonthName}
+				th Споживання
+				th Сума
+				tr
+				td Місяць
+				td #{gasPrevMonthUsage}
+				td #{gasPrevMonthCost}
+				tr
+				td Середнє, день
+				td #{gasPrevAvgUsagePerDay}
+				td #{gasPrevAvgCostPerDay}
 
 		h3 Електрика:
 		.previous-readings-label Тариф: 
@@ -148,20 +160,22 @@ html(lang="en")
 			td Середнє, день
 			td #{electricityCurrAvgUsagePerDay}
 			td #{electricityCurrAvgCostPerDay}
-		h4 Попередній місяць:
-		table
-			tr
-			th #{previousMonthName}
-			th Споживання
-			th Сума
-			tr
-			td Місяць
-			td #{electricityPrevMonthUsage}
-			td #{electricityPrevMonthCost}
-			tr
-			td Середнє, день
-			td #{electricityPrevAvgUsagePerDay}
-			td #{electricityPrevAvgCostPerDay}
+		details
+			summary Натисніть для перегляду попереднього місяця
+			h4 Попередній місяць:
+			table.previous-month
+				tr
+				th #{previousMonthName}
+				th Споживання
+				th Сума
+				tr
+				td Місяць
+				td #{electricityPrevMonthUsage}
+				td #{electricityPrevMonthCost}
+				tr
+				td Середнє, день
+				td #{electricityPrevAvgUsagePerDay}
+				td #{electricityPrevAvgCostPerDay}
 
 		p
 		a(href="/history")
