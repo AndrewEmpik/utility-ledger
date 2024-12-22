@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateElectricityDto } from './dto/create-electricity.dto';
-import { UpdateElectricityDto } from './dto/update-electricity.dto';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { Decimal } from '@prisma/client/runtime/library';
@@ -13,14 +12,6 @@ export class ElectricityService {
     return await this.prisma.rEADINGS_ELECTRICITY.create({
       data: createElectricityDto,
     });
-  }
-
-  findAll() {
-    return `This action returns all electricity`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} electricity`;
   }
 
   async getLastReadings(n: number = 1) {
@@ -133,14 +124,6 @@ export class ElectricityService {
       currentMonthReading: Number(currentMonthReading.VALUE),
       daysInPreviousMonth,
     };
-  }
-
-  update(id: number, updateElectricityDto: UpdateElectricityDto) {
-    return `This action updates a #${id} electricity`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} electricity`;
   }
 
   dateToFullDayRange(date: Date) {

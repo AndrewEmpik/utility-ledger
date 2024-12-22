@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateGasDto } from './dto/create-gas.dto';
-import { UpdateGasDto } from './dto/update-gas.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { Decimal } from '@prisma/client/runtime/library';
 import { ReadingsArray } from 'src/app.service';
@@ -13,14 +12,6 @@ export class GasService {
     return await this.prisma.rEADINGS_GAS.create({
       data: createGasDto,
     });
-  }
-
-  findAll() {
-    return `This action returns all gas`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} gas`;
   }
 
   async getLastReadings(n: number = 1): Promise<ReadingsArray> {
@@ -131,14 +122,6 @@ export class GasService {
       currentMonthReading: Number(currentMonthReading.VALUE),
       daysInPreviousMonth,
     };
-  }
-
-  update(id: number, updateGasDto: UpdateGasDto) {
-    return `This action updates a #${id} gas`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} gas`;
   }
 
   dateToFullDayRange(date: Date) {
