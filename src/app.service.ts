@@ -83,7 +83,18 @@ export class AppService {
       currentMonthName,
       previousMonthName,
     };
-    res.send(pug.renderFile('./views/index.pug', vars));
+
+    const roundedVars = Object.fromEntries(
+      Object.entries(vars).map(([key, value]) => [
+        key,
+        (() => {
+          if (typeof value === 'string') return value;
+          return this.round2(value);
+        })(),
+      ]),
+    );
+
+    res.send(pug.renderFile('./views/index.pug', roundedVars));
   }
 
   async getHistoryPage(request, res) {
@@ -147,30 +158,25 @@ export class AppService {
     const gasCurrReadingValue = Number(gasCurrReading.reading);
 
     const gasCurrUsage = gasCurrReadingValue - gasFirstDay;
-    let gasCurrCost = this.round2(gasCurrUsage * this.gasRate);
-    let gasForecastUsage = this.round2(gasCurrUsage * forecastCoefficient);
-    let gasForecastCost = this.round2(gasCurrCost * forecastCoefficient);
-    let gasCurrAvgUsagePerDay =
-      daysPassed > 0 ? this.round2(gasCurrUsage / daysPassed) : 0;
-    let gasCurrAvgCostPerDay =
-      daysPassed > 0 ? this.round2(gasCurrCost / daysPassed) : 0;
+    let gasCurrCost = gasCurrUsage * this.gasRate;
+    let gasForecastUsage = gasCurrUsage * forecastCoefficient;
+    let gasForecastCost = gasCurrCost * forecastCoefficient;
+    let gasCurrAvgUsagePerDay = daysPassed > 0 ? gasCurrUsage / daysPassed : 0;
+    let gasCurrAvgCostPerDay = daysPassed > 0 ? gasCurrCost / daysPassed : 0;
 
     // previous month
     const gasLastMonthReadings = await this.gasService.getLastMonthReadings(
       new Date(baseDate),
     );
 
-    let gasPrevMonthUsage = this.round2(
+    let gasPrevMonthUsage =
       gasLastMonthReadings.currentMonthReading -
-        gasLastMonthReadings.previousMonthReading,
-    );
-    let gasPrevMonthCost = this.round2(gasPrevMonthUsage * this.gasRate);
-    let gasPrevAvgUsagePerDay = this.round2(
-      gasPrevMonthUsage / gasLastMonthReadings.daysInPreviousMonth,
-    );
-    let gasPrevAvgCostPerDay = this.round2(
-      gasPrevMonthCost / gasLastMonthReadings.daysInPreviousMonth,
-    );
+      gasLastMonthReadings.previousMonthReading;
+    let gasPrevMonthCost = gasPrevMonthUsage * this.gasRate;
+    let gasPrevAvgUsagePerDay =
+      gasPrevMonthUsage / gasLastMonthReadings.daysInPreviousMonth;
+    let gasPrevAvgCostPerDay =
+      gasPrevMonthCost / gasLastMonthReadings.daysInPreviousMonth;
 
     // ELECTRICITY
 
@@ -183,36 +189,28 @@ export class AppService {
 
     const electricityCurrUsage = electricityCurrReading - electricityFirstDay;
     let electricityCurrCost = electricityCurrUsage * this.electricityRate;
-    let electricityForecastUsage = this.round2(
-      electricityCurrUsage * forecastCoefficient,
-    );
-    let electricityForecastCost = this.round2(
-      electricityCurrCost * forecastCoefficient,
-    );
+    let electricityForecastUsage = electricityCurrUsage * forecastCoefficient;
+    let electricityForecastCost = electricityCurrCost * forecastCoefficient;
     let electricityCurrAvgUsagePerDay =
-      daysPassed > 0 ? this.round2(electricityCurrUsage / daysPassed) : 0;
+      daysPassed > 0 ? electricityCurrUsage / daysPassed : 0;
     let electricityCurrAvgCostPerDay =
-      daysPassed > 0 ? this.round2(electricityCurrCost / daysPassed) : 0;
+      daysPassed > 0 ? electricityCurrCost / daysPassed : 0;
 
     // previos month
     const electricityLastMonthReadings =
       await this.electricityService.getLastMonthReadings(new Date(baseDate));
 
-    let electricityPrevMonthUsage = this.round2(
+    let electricityPrevMonthUsage =
       electricityLastMonthReadings.currentMonthReading -
-        electricityLastMonthReadings.previousMonthReading,
-    );
-    let electricityPrevMonthCost = this.round2(
-      electricityPrevMonthUsage * this.electricityRate,
-    );
-    let electricityPrevAvgUsagePerDay = this.round2(
+      electricityLastMonthReadings.previousMonthReading;
+    let electricityPrevMonthCost =
+      electricityPrevMonthUsage * this.electricityRate;
+    let electricityPrevAvgUsagePerDay =
       electricityPrevMonthUsage /
-        electricityLastMonthReadings.daysInPreviousMonth,
-    );
-    let electricityPrevAvgCostPerDay = this.round2(
+      electricityLastMonthReadings.daysInPreviousMonth;
+    let electricityPrevAvgCostPerDay =
       electricityPrevMonthCost /
-        electricityLastMonthReadings.daysInPreviousMonth,
-    );
+      electricityLastMonthReadings.daysInPreviousMonth;
 
     return {
       gasCurrUsage,
