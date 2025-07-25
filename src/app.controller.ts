@@ -22,12 +22,13 @@ export class AppController {
       gas: string;
       electricity: string;
     },
-    //@Req() request: Request,
-    //@Res() response: Response,
+    @Res() res: any,
   ) {
-    this.appService.submitReadings(
+    await this.appService.submitReadings(
       parseFloat(data.gas),
       parseInt(data.electricity),
     );
+    const pug = require('pug');
+    res.send(pug.renderFile('./views/success.pug'));
   }
 }
