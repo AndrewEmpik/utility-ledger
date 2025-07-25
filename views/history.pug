@@ -40,6 +40,9 @@ html(lang="en")
 				border: 1px solid grey;
 				padding: 5px;
 			}
+			.weekend-row {
+				background: #3a1f2f;
+			}
 	body
 		h3 Історія показників і споживання за останні 32 дні:
 
@@ -53,10 +56,100 @@ html(lang="en")
 					th Вик.
 
 			tbody
-				each record in readings
-					tr
+				each record, i in readings
+					- const isWeekend = (() => { const d = new Date(record.date.split('.').reverse().join('-')); return d.getDay() === 0 || d.getDay() === 6 })();
+					tr(class=isWeekend ? 'weekend-row' : '')
 						td.previous-readings-label= record.date
 						td.previous-readings-label= record.gasReading
 						td.previous-readings-label= record.gasUse	
 						td.previous-readings-label= record.electricityReading
 						td.previous-readings-label= record.electricityUse	
+	// Adding visual charts in the bottom of the page
+	div(style="margin-top: 40px;")
+		h3 Графік споживання газу
+		canvas#gasChart(width="800" height="300")
+	div(style="margin-top: 40px;")
+		h3 Графік споживання електрики
+		canvas#electricityChart(width="800" height="300")
+
+	script(src="https://cdn.jsdelivr.net/npm/chart.js")
+	script.
+		window.readings = !{JSON.stringify(readings)};
+		document.addEventListener('DOMContentLoaded', function() {
+			const data = window.readings;
+			const labels = data.map(r => r.date);
+			const gasUse = data.map(r => r.gasUse);
+			const electricityUse = data.map(r => r.electricityUse);
+			// Array: if a weekend day
+			const isWeekendArr = data.map(r => {
+				const d = new Date(r.date.split('.').reverse().join('-'));
+				return d.getDay() === 0 || d.getDay() === 6;
+			});
+
+			// Visual chart for gas
+			const gasCtx = document.getElementById('gasChart').getContext('2d');
+			new Chart(gasCtx, {
+				type: 'line',
+				data: {
+					labels: labels,
+					datasets: [{
+						label: 'Споживання газу',
+						data: gasUse,
+						borderColor: function(ctx) {
+							const idx = ctx.chart.data.labels.findIndex(l => l === ctx.label);
+							return isWeekendArr[ctx.dataIndex] ? 'red' : 'orange';
+						},
+						backgroundColor: function(ctx) {
+							return isWeekendArr[ctx.dataIndex] ? 'rgba(255,0,0,0.2)' : 'rgba(255,165,0,0.2)';
+						},
+						pointRadius: 4,
+						pointBackgroundColor: function(ctx) {
+							return isWeekendArr[ctx.dataIndex] ? 'red' : 'orange';
+						},
+						pointBorderColor: function(ctx) {
+							return isWeekendArr[ctx.dataIndex] ? 'red' : 'orange';
+						},
+						fill: true,
+					}]
+				},
+				options: {
+					responsive: false,
+					scales: {
+						y: { beginAtZero: true }
+					}
+				}
+			});
+
+			// Visual chart for electricity
+			const electricityCtx = document.getElementById('electricityChart').getContext('2d');
+			new Chart(electricityCtx, {
+				type: 'line',
+				data: {
+					labels: labels,
+					datasets: [{
+						label: 'Споживання електрики',
+						data: electricityUse,
+						borderColor: function(ctx) {
+							return isWeekendArr[ctx.dataIndex] ? 'red' : 'lightblue';
+						},
+						backgroundColor: function(ctx) {
+							return isWeekendArr[ctx.dataIndex] ? 'rgba(255,0,0,0.2)' : 'rgba(173,216,230,0.2)';
+						},
+						pointRadius: 4,
+						pointBackgroundColor: function(ctx) {
+							return isWeekendArr[ctx.dataIndex] ? 'red' : 'lightblue';
+						},
+						pointBorderColor: function(ctx) {
+							return isWeekendArr[ctx.dataIndex] ? 'red' : 'lightblue';
+						},
+						fill: true,
+					}]
+				},
+				options: {
+					responsive: false,
+					scales: {
+						y: { beginAtZero: true }
+					}
+				}
+			});
+		});
